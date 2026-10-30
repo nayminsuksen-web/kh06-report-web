@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>ผลตรวจสุขภาพ — เคหะคลินิกเวชกรรม</title>
+<link rel="icon" href="logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #2f8f3a;
+    --green-dark: #23702c;
+    --teal: #7fc3c3;
+    --teal-soft: #e8f5f5;
+    --ink: #1f2d2d;
+    --muted: #5d6b6b;
+    --line: #cfe1e1;
+    --error: #b3261e;
+    --error-soft: #fdecea;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; font-family: "Sarabun", system-ui, sans-serif; color: var(--ink);
+    background: linear-gradient(180deg, var(--teal-soft) 0%, #fff 60%);
+    display: flex; flex-direction: column; align-items: center; padding: 24px 16px;
+  }
+  main { width: 100%; max-width: 420px; }
+  header { text-align: center; margin-bottom: 20px; }
+  header img { width: 120px; height: 120px; }
+  h1 { font-size: 1.5rem; margin: 8px 0 2px; }
+  header p { margin: 0; color: var(--muted); }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 24px 20px; box-shadow: 0 4px 16px rgba(31, 45, 45, .06); }
+  label { display: block; font-weight: 600; margin-bottom: 6px; }
+  .field { margin-bottom: 18px; }
+  input {
+    width: 100%; font: inherit; font-size: 1.15rem; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: 10px;
+    letter-spacing: .04em; background: #fcfefe;
+  }
+  input:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(127, 195, 195, .35); }
+  input[aria-invalid="true"] { border-color: var(--error); }
+  .hint { font-size: .9rem; color: var(--muted); margin-top: 4px; }
+  .field-error { font-size: .9rem; color: var(--error); margin-top: 4px; min-height: 0; }
+  button, .btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; font: inherit; font-size: 1.1rem; font-weight: 700;
+    padding: 14px; border: 0; border-radius: 10px; background: var(--green); color: #fff; cursor: pointer; text-decoration: none;
+  }
+  button:hover, .btn:hover { background: var(--green-dark); }
+  button:disabled { opacity: .65; cursor: wait; }
+  .btn.secondary { background: #fff; color: var(--green); border: 1.5px solid var(--green); margin-top: 10px; }
+  .btn.secondary:hover { background: var(--teal-soft); }
+  .spinner { width: 18px; height: 18px; border: 3px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .alert { border-radius: 10px; padding: 12px 14px; margin-bottom: 16px; background: var(--error-soft); color: var(--error); }
+  .success { text-align: center; }
+  .success .icon { font-size: 2.5rem; color: var(--green); }
+  .success h2 { margin: 4px 0 6px; font-size: 1.25rem; }
+  .success p { color: var(--muted); margin: 0 0 16px; }
+  .note { font-size: .85rem; color: var(--muted); margin-top: 18px; line-height: 1.5; }
+  .linkbtn { background: none; color: var(--green); font-weight: 600; font-size: 1rem; padding: 10px; margin-top: 6px; }
+  .linkbtn:hover { background: none; text-decoration: underline; }
+  [hidden] { display: none !important; }
+  footer { margin-top: 24px; font-size: .85rem; color: var(--muted); text-align: center; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="logo.jpg" alt="โลโก้เคหะคลินิกเวชกรรม">
+    <h1>ผลตรวจสุขภาพ</h1>
+    <p>เคหะคลินิกเวชกรรม</p>
+  </header>
+
+  <section class="card" id="form-card">
+    <div class="alert" id="alert" role="alert" hidden></div>
+    <form id="form" novalidate>
+      <div class="field">
+        <label for="cid">เลขบัตรประชาชน</label>
+        <input id="cid" name="cid" inputmode="numeric" autocomplete="off" placeholder="X-XXXX-XXXXX-XX-X" maxlength="24" required>
+        <div class="field-error" id="cid-error"></div>
+      </div>
+      <div class="field">
+        <label for="phone">เบอร์โทรศัพท์</label>
+        <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="08X-XXX-XXXX" maxlength="20" required>
+        <div class="hint">เบอร์ที่ให้ไว้ในวันตรวจ</div>
+        <div class="field-error" id="phone-error"></div>
+      </div>
+      <button type="submit" id="submit"><span class="spinner" hidden></span><span class="label">ดาวน์โหลดผลตรวจ</span></button>
+    </form>
+    <p class="note">ข้อมูลที่กรอกใช้เพื่อยืนยันตัวตนสำหรับดาวน์โหลดผลตรวจของท่านเท่านั้น ระบบไม่บันทึกเลขบัตรประชาชนและเบอร์โทรศัพท์ที่กรอก</p>
+  </section>
+
+  <section class="card success" id="success" hidden>
+    <div class="icon">✓</div>
+    <h2>พบผลตรวจของท่านแล้ว</h2>
+    <p>หากไฟล์ไม่ดาวน์โหลดอัตโนมัติ กดปุ่มด้านล่าง</p>
+    <a class="btn" id="download" download>ดาวน์โหลด PDF</a>
+    <a class="btn secondary" id="open" target="_blank" rel="noopener">เปิดดู PDF</a>
+    <p class="note">หากเปิดจากแอป LINE หรือ Facebook แล้วดาวน์โหลดไม่ได้ ให้กดเมนู ⋯ แล้วเลือก “เปิดในเบราว์เซอร์” (Chrome / Safari)</p>
+    <button type="button" class="linkbtn" id="again">ค้นหาผลตรวจอื่น</button>
+  </section>
+</main>
+<footer>© เคหะคลินิกเวชกรรม</footer>
+
+<script src="normalize.js"></script>
+<script>
+  var API_URL = "https://script.google.com/macros/s/AKfycbzWMX_XfRH-_YgrTvCnna29AdQxcJ_omv4PvXoqglOgqPkXxVIWcSSE8a8sxSizuPRc/exec";
+  var MESSAGES = {
+    INVALID: "ข้อมูลไม่ถูกต้อง กรุณาตรวจสอบเลขบัตรประชาชนและเบอร์โทรศัพท์",
+    NOT_FOUND: "ไม่พบผลตรวจที่ตรงกับเลขบัตรประชาชนและเบอร์โทรศัพท์นี้ กรุณาตรวจสอบอีกครั้ง หรือติดต่อคลินิก โทร. 06-5253-5253 ทุกวันจันทร์ถึงศุกร์ เวลา 08:00 น. - 17:00 น.",
+    LOCKED: "กรอกข้อมูลไม่ถูกต้องเกินจำนวนครั้งที่กำหนด กรุณารอ 15 นาทีแล้วลองใหม่",
+    BUSY: "ขณะนี้ระบบมีผู้ใช้งานจำนวนมาก กรุณาลองใหม่ในอีกประมาณ 10 นาที",
+    ERROR: "ระบบขัดข้อง กรุณาลองใหม่อีกครั้ง",
+  };
+
+  var $ = function (id) { return document.getElementById(id); };
+  var form = $("form"), cidEl = $("cid"), phoneEl = $("phone"), submit = $("submit"), alertEl = $("alert");
+  var blobUrl = null;
+
+  function formatCid(c) {
+    return /^\d{13}$/.test(c) ? c.replace(/^(\d)(\d{4})(\d{5})(\d{2})(\d)$/, "$1-$2-$3-$4-$5") : c;
+  }
+  function formatPhone(p) {
+    if (/^0\d{9}$/.test(p)) return p.replace(/^(\d{3})(\d{3})(\d{4})$/, "$1-$2-$3");
+    if (/^0\d{8}$/.test(p)) return p.replace(/^(\d{2})(\d{3})(\d{4})$/, "$1-$2-$3");
+    return p;
+  }
+  function setFieldError(el, msg) {
+    $(el.id + "-error").textContent = msg;
+    el.setAttribute("aria-invalid", msg ? "true" : "false");
+  }
+  function showAlert(msg) { alertEl.textContent = msg; alertEl.hidden = !msg; }
+  function setLoading(on) {
+    submit.disabled = on;
+    submit.querySelector(".spinner").hidden = !on;
+    submit.querySelector(".label").textContent = on ? "กำลังค้นหา…" : "ดาวน์โหลดผลตรวจ";
+  }
+
+  cidEl.addEventListener("blur", function () {
+    var c = KH06.normalizeCid(cidEl.value);
+    if (c) { cidEl.value = formatCid(c); setFieldError(cidEl, KH06.validateCid(c)); }
+  });
+  phoneEl.addEventListener("blur", function () {
+    var p = KH06.normalizePhone(phoneEl.value);
+    if (p) { phoneEl.value = formatPhone(p); setFieldError(phoneEl, KH06.validatePhone(p)); }
+  });
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    showAlert("");
+    var cid = KH06.normalizeCid(cidEl.value), phone = KH06.normalizePhone(phoneEl.value);
+    var cidErr = KH06.validateCid(cid), phoneErr = KH06.validatePhone(phone);
+    setFieldError(cidEl, cidErr);
+    setFieldError(phoneEl, phoneErr);
+    if (cidErr || phoneErr) { (cidErr ? cidEl : phoneEl).focus(); return; }
+
+    setLoading(true);
+    fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },  // simple request: ไม่มี CORS preflight
+      body: JSON.stringify({ cid: cid, phone: phone }),
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (res) {
+        if (!res.ok) { showAlert(MESSAGES[res.code] || MESSAGES.ERROR); return; }
+        showResult(res);
+      })
+      .catch(function () { showAlert(MESSAGES.ERROR); })
+      .then(function () { setLoading(false); });
+  });
+
+  function showResult(res) {
+    var bin = atob(res.data), bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    if (blobUrl) URL.revokeObjectURL(blobUrl);
+    blobUrl = URL.createObjectURL(new Blob([bytes], { type: "application/pdf" }));
+    var dl = $("download");
+    dl.href = blobUrl;
+    dl.download = res.filename;
+    $("open").href = blobUrl;
+    $("form-card").hidden = true;
+    $("success").hidden = false;
+    dl.click();
+  }
+
+  $("again").addEventListener("click", function () {
+    if (blobUrl) { URL.revokeObjectURL(blobUrl); blobUrl = null; }
+    form.reset();
+    setFieldError(cidEl, "");
+    setFieldError(phoneEl, "");
+    $("success").hidden = true;
+    $("form-card").hidden = false;
+    cidEl.focus();
+  });
+</script>
+</body>
+</html>
